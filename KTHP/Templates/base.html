@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TechStore | Cửa hàng công nghệ tương lai{% endblock %}</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <header>
+        <div class="navbar">
+            <a href="{% url 'home:home' %}" class="logo">TECHSTORE</a>
+            <form action="{% url 'home:product_list' %}" method="get" class="search-form" style="margin: 0 2rem; flex-grow: 1; max-width: 450px; display: flex; align-items: center;">
+                <div style="position: relative; width: 100%;">
+                    <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..." value="{{ query|default:'' }}"
+                        style="width: 100%; padding: 0.6rem 1rem 0.6rem 2.8rem; border-radius: 2rem; border: 2px solid #38bdf8; background: rgba(30, 41, 59, 0.9); color: white; outline: none; transition: all 0.3s; font-family: 'Inter', sans-serif;"
+                        onfocus="this.style.boxShadow='0 0 15px rgba(56, 189, 248, 0.5)';"
+                        onblur="this.style.boxShadow='none';">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 1.2rem; height: 1.2rem; color: #38bdf8;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </form>
+
+            <nav class="nav-links">
+                <a href="{% url 'home:home' %}">Trang chủ</a>
+                <a href="{% url 'home:product_list' %}">Cửa hàng</a>
+                {% if request.user.is_staff %}
+                <a href="{% url 'admin:index' %}">Quản trị</a>
+                {% endif %}
+            </nav>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+
+                <!-- Language Switcher -->
+                <div
+                    style="display: flex; align-items: center; gap: 0.8rem; border-right: 1px solid #334155; padding-right: 1.5rem;">
+                    <a href="javascript:void(0)" onclick="switchLang('vi')" id="lang-vi"
+                        style="text-decoration: none; color: white; font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid #38bdf8; padding-bottom: 2px; transition: 0.2s;">VN</a>
+                    <span style="color: #475569; font-weight: 300;">|</span>
+                    <a href="javascript:void(0)" onclick="switchLang('en')" id="lang-en"
+                        style="text-decoration: none; color: #94a3b8; font-weight: bold; font-size: 1.1rem; padding-bottom: 2px; transition: 0.2s;"
+                        onmouseover="this.style.color='white'"
+                        onmouseout="if(currentLang!=='en') this.style.color='#94a3b8'">EN</a>
+                </div>
+
+                <a href="{% url 'home:cart_detail' %}" class="cart-icon" id="cart-icon">
+                    🛒 Giỏ hàng
+                    {% with total_items=cart|length %}
+                    <span class="cart-count" id="cart-count-badge">{{ total_items }}</span>
+                    {% endwith %}
+                </a>
+
+                <div
+                    style="display: flex; align-items: center; gap: 1rem; border-left: 1px solid #334155; padding-left: 1.5rem;">
+                    {% if request.user.is_authenticated %}
+                    <span style="color: #94a3b8; font-size: 0.9rem;">
+                        Chào,
+                        <strong style="color: #f8fafc;">{{ user.username }}</strong>
+                    </span>
+                    <form action="{% url 'home:logout' %}" method="post" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit"
+                            style="background:none; border:none; color:#ef4444; font-weight:bold; cursor:pointer; padding:0; transition:color 0.3s;"
+                            onmouseover="this.style.color='#fca5a5'" onmouseout="this.style.color='#ef4444'">Đăng
+                            xuất</button>
+                    </form>
+                    {% else %}
+                    <a href="{% url 'home:login' %}"
+                        style="color: #cbd5e1; text-decoration: none; font-weight: 500; transition: color 0.3s;"
+                        onmouseover="this.style.color='#38bdf8'" onmouseout="this.style.color='#cbd5e1'">Đăng nhập</a>
+                    <a href="{% url 'home:register' %}" class="btn"
+                        style="padding: 0.4rem 1rem; border-radius: 2rem; color: #0f172a !important; font-size: 0.9rem;">Đăng
+                        ký</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 TechStore. All rights reserved.</p>
+        <p>Built with Django by Antigravity.</p>
+    </footer>
+
+    <!-- Chat Widget -->
+    <div id="chat-widget" class="minimized">
+        <div id="chat-header" onclick="toggleChat()">
+            <span>💬 Hỗ trợ trực tuyến</span>
+            <span id="chat-toggle-icon">▲</span>
+        </div>
+        <div id="chat-messages">
+            <!-- Messages will be loaded here -->
+            <div class="message admin">Xin chào! Chúng tôi có thể giúp gì cho bạn?</div>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Nhập tin nhắn..."
+                onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button id="send-btn" onclick="sendMessage()">Gửi</button>
+        </div>
+    </div>
+
+    <!-- Chat Logic -->
+    <script>
+        let lastMessageId = 0;
+        const msgContainer = document.getElementById('chat-messages');
+        const inputField = document.getElementById('chat-input');
+
+        function toggleChat() {
+            const widget = document.getElementById('chat-widget');
+            const icon = document.getElementById('chat-toggle-icon');
+            widget.classList.toggle('minimized');
+            icon.innerText = widget.classList.contains('minimized') ? '▲' : '▼';
+            if (!widget.classList.contains('minimized')) {
+                scrollToBottom();
+                fetchMessages();
+            }
+        }
+
+        function scrollToBottom() {
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
+
+        function appendMessage(content, is_admin) {
+            const div = document.createElement('div');
+            div.className = 'message ' + (is_admin ? 'admin' : 'user');
+            div.innerText = content;
+            msgContainer.appendChild(div);
+            scrollToBottom();
+        }
+
+        function sendMessage() {
+            const content = inputField.value.trim();
+            if (!content) return;
+
+            inputField.value = '';
+            appendMessage(content, false); // Optimistic UI
+
+            fetch('/chat/send/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `message=${encodeURIComponent(content)}`
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status !== 'ok') console.error('Error sending message');
+                });
+        }
+
+        function fetchMessages() {
+            if (document.getElementById('chat-widget').classList.contains('minimized')) return;
+            fetch(`/chat/get/?last_id=${lastMessageId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            if (msg.id > lastMessageId) {
+                                // Don't duplicate optimistic messages for users, here we only append admin messages or update real layout.
+                                // For simplicity since we use optimistic UI, we could get duplicate User messages. A better approach is to not render self-messages from fetch.
+                                if (msg.is_admin) {
+                                    appendMessage(msg.content, msg.is_admin);
+                                }
+                                lastMessageId = msg.id;
+                            }
+                        });
+                    }
+                });
+        }
+
+        // --- Flying Cart Animation ---
+        function addToCartAjax(event, productId, buttonElement) {
+            event.preventDefault();
+
+            // Get card element
+            const card = buttonElement.closest('.product-card');
+            const placeholder = card.querySelector('.product-image');
+            const rawImg = card.querySelector('.product-image img');
+            const cartIcon = document.getElementById('cart-icon');
+
+            // Clone the image or just create a dummy flying box if no image
+            let flyingObj;
+            let startRect;
+
+            if (rawImg) {
+                flyingObj = rawImg.cloneNode(true);
+                startRect = rawImg.getBoundingClientRect();
+                flyingObj.style.objectFit = 'cover';
+            } else {
+                flyingObj = document.createElement('div');
+                // Lấy style giống placeholder
+                flyingObj.style.background = '#1e293b';
+                flyingObj.style.display = 'flex';
+                flyingObj.style.alignItems = 'center';
+                flyingObj.style.justifyContent = 'center';
+                flyingObj.innerHTML = '<span style="color:#475569; font-size:12px;">[SP]</span>';
+                startRect = placeholder.getBoundingClientRect();
+            }
+
+            flyingObj.style.position = 'fixed';
+            flyingObj.style.left = startRect.left + 'px';
+            flyingObj.style.top = startRect.top + 'px';
+            flyingObj.style.width = startRect.width + 'px';
+            flyingObj.style.height = startRect.height + 'px';
+            flyingObj.style.borderRadius = '1rem';
+            flyingObj.style.zIndex = '9999';
+            flyingObj.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+            flyingObj.style.boxShadow = '0 10px 20px rgba(0,0,0,0.5)';
+
+            document.body.appendChild(flyingObj);
+
+            // Trigger animation
+            setTimeout(() => {
+                const cartRect = cartIcon.getBoundingClientRect();
+                flyingObj.style.left = (cartRect.left + cartRect.width / 2 - 20) + 'px';
+                flyingObj.style.top = (cartRect.top + cartRect.height / 2 - 20) + 'px';
+                flyingObj.style.width = '40px';
+                flyingObj.style.height = '40px';
+                flyingObj.style.opacity = '0.2';
+                flyingObj.style.transform = 'scale(0.3) rotate(360deg)';
+                flyingObj.style.borderRadius = '50%';
+            }, 50);
+
+            setTimeout(() => {
+                if (flyingObj.parentNode) document.body.removeChild(flyingObj);
+            }, 850);
+
+            // AJAX request
+            const csrfToken = card.querySelector('input[name="csrfmiddlewaretoken"]').value;
+            fetch(`/cart/add/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `csrfmiddlewaretoken=${csrfToken}&quantity=1`
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        // Cập nhật số lượng
+                        const badge = document.getElementById('cart-count-badge');
+                        badge.innerText = data.cart_count;
+
+                        // Lắc nhẹ icon giỏ hàng
+                        cartIcon.style.transform = 'scale(1.2)';
+                        setTimeout(() => {
+                            cartIcon.style.transform = 'scale(1)';
+                        }, 200);
+                    }
+                });
+        }
+
+        // --- Basic AI Dictionary Translation ---
+        const dictionary = {
+            // Navbar
+            "Trang chủ": "Home",
+            "Cửa hàng": "Store",
+            "Quản trị": "Admin Dashboard",
+            "Giỏ hàng": "Cart",
+            "Đăng nhập": "Login",
+            "Đăng ký": "Register",
+            "Đăng xuất": "Logout",
+            "Chào, ": "Hello, ",
+            // Hero
+            "Khám phá công nghệ đỉnh cao": "Discover Top Technology",
+            "Nâng tầm cuộc sống với các thiết bị công nghệ mới nhất. Mua sắm thông minh, giao hàng siêu tốc.": "Elevate your life with the latest tech devices. Smart shopping, lightning fast delivery.",
+            "Mua sắm ngay": "Shop Now",
+            // Products & Categories
+            "Sản phẩm nổi bật": "Featured Products",
+            "Xem tất cả": "View All",
+            "Mua ngay": "Buy Now",
+            "Chi tiết": "Details",
+            "[Ảnh chưa được cập nhật]": "[No image yet]",
+            "Điện thoại": "Phones",
+            "Laptop": "Laptops",
+            "Đồng hồ thông minh": "Smartwatches",
+            "Phụ kiện": "Accessories",
+            "VNĐ": "VND",
+            
+            // Checkout
+            "Thanh toán": "Checkout",
+            "Thông tin giao hàng": "Shipping Information",
+            "Họ": "First Name",
+            "Tên": "Last Name",
+            "Địa chỉ": "Address",
+            "Thành phố": "City",
+            "Tóm tắt đơn hàng": "Order Summary",
+            "Tổng cộng": "Total",
+            "Phương thức thanh toán": "Payment Method",
+            "💵 Thanh toán tiền mặt khi nhận hàng (COD)": "💵 Cash on Delivery (COD)",
+            "💳 Thẻ tín dụng / Ghi nợ": "💳 Credit / Debit Card",
+            "🏦 Chuyển khoản qua Ngân hàng": "🏦 Bank Transfer",
+            "💳 Xác nhận đặt hàng": "💳 Confirm Order",
+
+            // Utilities & Chat
+            "💬 Hỗ trợ trực tuyến": "💬 Live Support",
+            "Xin chào! Chúng tôi có thể giúp gì cho bạn?": "Hello! How can we help you?",
+            "Nhập tin nhắn...": "Type your message...",
+            "Gửi": "Send",
+            "Hỗ trợ trực tuyến": "Live Support",
+            "Tìm kiếm sản phẩm...": "Search products..."
+        };
+        let currentLang = 'vi'; // default
+
+        function switchLang(targetLang) {
+            if (currentLang === targetLang) return;
+
+            // Adjust UI button styles
+            document.getElementById('lang-' + targetLang).style.color = 'white';
+            document.getElementById('lang-' + targetLang).style.borderBottom = '2px solid #38bdf8';
+            const otherLang = targetLang === 'vi' ? 'en' : 'vi';
+            document.getElementById('lang-' + otherLang).style.color = '#94a3b8';
+            document.getElementById('lang-' + otherLang).style.borderBottom = 'none';
+
+            // Recursive translate
+            const walkDOM = (node) => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    let text = node.nodeValue.trim();
+                    if (text !== '') {
+                        if (targetLang === 'en' && dictionary[text]) {
+                            node.nodeValue = node.nodeValue.replace(text, dictionary[text]);
+                        } else if (targetLang === 'vi') {
+                            // Find original VI key for the EN text
+                            let viKey = Object.keys(dictionary).find(key => dictionary[key] === text);
+                            if (viKey) node.nodeValue = node.nodeValue.replace(text, viKey);
+                        }
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    if (['SCRIPT', 'STYLE'].includes(node.tagName)) return; // skip code
+
+                    // Translate placeholders
+                    if (node.placeholder) {
+                        let text = node.placeholder.trim();
+                        if (targetLang === 'en' && dictionary[text]) {
+                            node.placeholder = dictionary[text];
+                        } else if (targetLang === 'vi') {
+                            let viKey = Object.keys(dictionary).find(key => dictionary[key] === text);
+                            if (viKey) node.placeholder = viKey;
+                        }
+                    }
+
+                    node.childNodes.forEach(walkDOM);
+                }
+            };
+
+            walkDOM(document.body);
+            currentLang = targetLang;
+        }
+    </script>
+</body>
+
+</html>

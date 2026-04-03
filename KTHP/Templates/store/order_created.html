@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align: center; padding: 4rem; background: #1e293b; border-radius: 1rem; border: 1px solid #334155; max-width: 600px; margin: 0 auto;">
+    <div style="font-size: 5rem; color: #10b981; margin-bottom: 1rem;">✓</div>
+    <h2 style="font-size: 2rem; margin-bottom: 1rem; color: #f8fafc;">Đặt hàng thành công!</h2>
+    <p style="color: #94a3b8; font-size: 1.1rem; margin-bottom: 2rem;">Cảm ơn <strong>{{ order.first_name }}</strong> đã mua sắm tại TechStore. Mã đơn hàng của bạn là <strong>#{{ order.id }}</strong>. Chúng tôi sẽ sớm liên hệ để giao hàng.</p>
+    <a href="{% url 'home:home' %}" class="btn">Quay lại trang chủ</a>
+</div>
+{% endblock %}

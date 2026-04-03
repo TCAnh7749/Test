@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="display: flex; gap: 2rem;">
+    <!-- Sidebar -->
+    <aside style="width: 250px; flex-shrink: 0; background: #1e293b; padding: 1.5rem; border-radius: 1rem; border: 1px solid #334155;">
+        <h3 style="margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem;">Danh mục</h3>
+        <ul style="list-style: none;">
+            <li style="margin-bottom: 0.5rem;">
+                <a href="{% url 'home:product_list' %}" class="{% if not category %}btn-outline{% endif %}" style="display: block; padding: 0.5rem; border-radius: 0.5rem; text-decoration: none; color: #f8fafc;">Tất cả sản phẩm</a>
+            </li>
+            {% for c in categories %}
+            <li style="margin-bottom: 0.5rem;">
+                <a href="{% url 'home:product_list_by_category' c.slug %}" style="display: block; padding: 0.5rem; border-radius: 0.5rem; text-decoration: none; color: {% if category.slug == c.slug %}#38bdf8{% else %}#cbd5e1{% endif %}; background: {% if category.slug == c.slug %}rgba(56, 189, 248, 0.1){% else %}transparent{% endif %};">
+                    {{ c.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </aside>
+
+    <!-- Main Products -->
+    <div style="flex-grow: 1;">
+        <div class="section-header">
+            <h2>{% if category %}{{ category.name }}{% else %}Tất cả sản phẩm{% endif %}</h2>
+        </div>
+        
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <div class="product-image" style="position: relative;">
+                    <form action="{% url 'home:cart_add' product.id %}" method="post" style="position: absolute; top: 10px; right: 10px; margin: 0; z-index: 10;">
+                        {% csrf_token %}
+                        <button type="button" onclick="addToCartAjax(event, '{{ product.id }}', this)" title="Thêm vào giỏ hàng" style="background: rgba(56, 189, 248, 0.9); border: none; width: 35px; height: 35px; border-radius: 50%; color: white; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; line-height: 1;">+</button>
+                    </form>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%;">
+                    {% else %}
+                        <span>[Ảnh SP]</span>
+                    {% endif %}
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">
+                        <a href="{% url 'home:product_detail' product.slug %}">{{ product.name }}</a>
+                    </h3>
+                    <div class="product-footer" style="flex-direction: column; align-items: flex-start; gap: 0.8rem;">
+                        <span class="product-price">{{ product.price|floatformat:0 }} VNĐ</span>
+                        <div style="display: flex; gap: 0.5rem; width: 100%;">
+                            <form action="{% url 'home:cart_add' product.id %}" method="post" style="margin: 0; flex: 1;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn" style="width: 100%; padding: 0.4rem 0; border-radius: 0.5rem; font-size: 0.9rem; text-align: center;">Mua ngay</button>
+                            </form>
+                            <a href="{% url 'home:product_detail' product.slug %}" class="btn btn-outline" style="flex: 1; padding: 0.4rem 0; border-radius: 0.5rem; font-size: 0.9rem; text-align: center;">Chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+                <p>Không có sản phẩm nào trong danh mục này.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

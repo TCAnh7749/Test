@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 4rem auto; background: #1e293b; padding: 2.5rem; border-radius: 1rem; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #38bdf8;">Đăng nhập</h2>
+    
+    {% if form.errors %}
+    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fca5a5; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.9rem;">
+        Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng thử lại.
+    </div>
+    {% endif %}
+
+    <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label style="color: #cbd5e1; font-weight: bold; font-size: 0.9rem;">{{ field.label }}</label>
+            {{ field }}
+        </div>
+        {% endfor %}
+        
+        <style>
+            input[type="text"], input[type="password"] { width: 100%; background: #0f172a; border: 1px solid #334155; color: #f8fafc; padding: 0.8rem; border-radius: 0.5rem; outline: none; }
+            input[type="text"]:focus, input[type="password"]:focus { border-color: #38bdf8; }
+        </style>
+
+        <button type="submit" class="btn" style="width: 100%; padding: 1rem; border-radius: 0.5rem; font-size: 1.1rem; margin-top: 1rem;">Đăng nhập</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 2rem; color: #94a3b8;">
+        Chưa có tài khoản? <a href="{% url 'home:register' %}" style="color: #38bdf8; font-weight: bold; text-decoration: none;">Đăng ký ngay</a>
+    </div>
+</div>
+{% endblock %}

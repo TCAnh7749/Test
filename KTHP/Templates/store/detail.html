@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="background: #1e293b; border-radius: 1rem; padding: 2rem; border: 1px solid #334155; display: flex; gap: 3rem; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 300px; display: flex; align-items: center; justify-content: center; background: #0f172a; border-radius: 1rem; overflow: hidden; height: 400px;">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%;">
+        {% else %}
+            <span style="color: #475569;">[Hình ảnh sản phẩm]</span>
+        {% endif %}
+    </div>
+
+    <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; justify-content: center;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ product.name }}</h1>
+        <p style="color: #38bdf8; font-weight: bold; margin-bottom: 1.5rem;">Danh mục: <a href="{% url 'home:product_list_by_category' product.category.slug %}" style="color: #38bdf8;">{{ product.category.name }}</a></p>
+        
+        <div style="font-size: 2rem; font-weight: bold; margin-bottom: 2rem; color: #f8fafc;">
+            {{ product.price|floatformat:0 }} VNĐ
+        </div>
+        
+        <form action="{% url 'home:cart_add' product.id %}" method="post" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+            {% csrf_token %}
+            <label for="quantity">Số lượng:</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" max="20" style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #334155; background: #0f172a; color: #fff; width: 60px;">
+            <button type="submit" class="btn">Thêm vào giỏ hàng</button>
+        </form>
+
+        <div style="border-top: 1px solid #334155; padding-top: 1.5rem;">
+            <h3>Thông số sản phẩm:</h3>
+            <ul style="list-style: inside space; margin-top: 1rem; color: #94a3b8; line-height: 1.8;">
+                {% if product.screen_size %}<li><strong>Màn hình:</strong> {{ product.screen_size }}</li>{% endif %}
+                {% if product.cpu %}<li><strong>CPU:</strong> {{ product.cpu }}</li>{% endif %}
+                {% if product.ram %}<li><strong>RAM:</strong> {{ product.ram }}</li>{% endif %}
+                {% if product.storage %}<li><strong>Bộ nhớ:</strong> {{ product.storage }}</li>{% endif %}
+                <li style="margin-top: 1rem; list-style-type: none;"><strong>Mô tả:</strong><br>{{ product.description|linebreaks }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

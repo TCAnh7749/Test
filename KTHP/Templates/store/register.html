@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 4rem auto; background: #1e293b; padding: 2.5rem; border-radius: 1rem; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #38bdf8;">Đăng ký tài khoản</h2>
+    
+    <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label style="color: #cbd5e1; font-weight: bold; font-size: 0.9rem;">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+            <small style="color: #64748b; font-size: 0.8rem;">{{ field.help_text|safe }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <span style="color: #ef4444; font-size: 0.85rem;">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        
+        <style>
+            .auth-input { width: 100%; background: #0f172a; border: 1px solid #334155; color: #f8fafc; padding: 0.8rem; border-radius: 0.5rem; outline: none; }
+            .auth-input:focus { border-color: #38bdf8; }
+            input[type="text"], input[type="password"] { width: 100%; background: #0f172a; border: 1px solid #334155; color: #f8fafc; padding: 0.8rem; border-radius: 0.5rem; outline: none; }
+            input[type="text"]:focus, input[type="password"]:focus { border-color: #38bdf8; }
+            ul.errorlist { list-style: none; padding: 0; margin-top: 0.5rem; color: #ef4444; font-size: 0.85rem; }
+        </style>
+
+        <button type="submit" class="btn" style="width: 100%; padding: 1rem; border-radius: 0.5rem; font-size: 1.1rem; margin-top: 1rem;">Đăng ký ngay</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 2rem; color: #94a3b8;">
+        Đã có tài khoản? <a href="{% url 'home:login' %}" style="color: #38bdf8; font-weight: bold; text-decoration: none;">Đăng nhập</a>
+    </div>
+</div>
+{% endblock %}

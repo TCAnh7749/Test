@@ -1,0 +1,8 @@
+﻿E:\Projects\KTHP\myproject\import_tests.py
+E:\Projects\KTHP\myproject\import_tests2.py
+E:\Projects\KTHP\myproject\check_template.py
+E:\Projects\KTHP\myproject\inspect_tests_file.py
+E:\Projects\KTHP\myproject\inspect_tests_file2.py
+E:\Projects\KTHP\myproject\inspect_tests_file3.py
+E:\Projects\KTHP\myproject\update_jazzmin.py
+E:\Projects\KTHP\myproject\update_settings.py

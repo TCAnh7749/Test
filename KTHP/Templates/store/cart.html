@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="section-header">
+    <h2>Giỏ hàng của bạn</h2>
+</div>
+
+{% if cart|length > 0 %}
+<div style="background: #1e293b; border-radius: 1rem; overflow: hidden; border: 1px solid #334155;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #0f172a; border-bottom: 1px solid #334155; text-align: left;">
+                <th style="padding: 1rem;">Sản phẩm</th>
+                <th style="padding: 1rem;">Số lượng</th>
+                <th style="padding: 1rem;">Đơn giá</th>
+                <th style="padding: 1rem;">Tổng cộng</th>
+                <th style="padding: 1rem;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart %}
+            {% with product=item.product %}
+            <tr style="border-bottom: 1px solid #334155;">
+                <td style="padding: 1rem; display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 50px; height: 50px; background: #0f172a; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 100%;">
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'home:product_detail' product.slug %}" style="color: #f8fafc; text-decoration: none; font-weight: bold;">{{ product.name }}</a>
+                </td>
+                <td style="padding: 1rem;">{{ item.quantity }}</td>
+                <td style="padding: 1rem;">{{ item.price|floatformat:0 }} VNĐ</td>
+                <td style="padding: 1rem;">{{ item.total_price|floatformat:0 }} VNĐ</td>
+                <td style="padding: 1rem;">
+                    <form action="{% url 'home:cart_remove' product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline" style="padding: 0.3rem 0.8rem; background: #ef4444; border-color: #ef4444; color: white;">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+            {% endwith %}
+            {% endfor %}
+            <tr style="background: rgba(56, 189, 248, 0.05);">
+                <td colspan="3" style="padding: 1.5rem; text-align: right; font-weight: bold; font-size: 1.2rem;">Tổng thanh toán:</td>
+                <td colspan="2" style="padding: 1.5rem; font-weight: bold; font-size: 1.2rem; color: #38bdf8;">{{ cart.get_total_price|floatformat:0 }} VNĐ</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div style="text-align: right; margin-top: 2rem;">
+    <a href="{% url 'home:product_list' %}" class="btn btn-outline" style="margin-right: 1rem;">Tiếp tục mua sắm</a>
+    <a href="{% url 'home:checkout' %}" class="btn">Thanh toán ngay</a>
+</div>
+
+{% else %}
+<div style="text-align: center; padding: 4rem; background: #1e293b; border-radius: 1rem; border: 1px solid #334155;">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">🛒</div>
+    <h3 style="margin-bottom: 2rem; color: #94a3b8;">Giỏ hàng của bạn đang trống</h3>
+    <a href="{% url 'home:product_list' %}" class="btn">Quay lại cửa hàng</a>
+</div>
+{% endif %}
+{% endblock %}

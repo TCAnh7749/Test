@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="section-header">
+    <h2>Thanh toán</h2>
+</div>
+
+<form method="post" style="display: flex; gap: 2rem; flex-wrap: wrap;">
+    {% csrf_token %}
+    <div style="flex: 2; min-width: 300px; background: #1e293b; padding: 2rem; border-radius: 1rem; border: 1px solid #334155;">
+        <h3 style="margin-bottom: 1.5rem; color: #38bdf8;">Thông tin giao hàng</h3>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Họ</label>
+                    <input type="text" name="first_name" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Tên</label>
+                    <input type="text" name="last_name" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+                </div>
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Email</label>
+                <input type="email" name="email" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Địa chỉ</label>
+                <input type="text" name="address" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Thành phố</label>
+                <input type="text" name="city" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+            </div>
+        </div>
+    </div>
+
+    <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 2rem; align-self: flex-start;">
+        <div style="background: #0f172a; padding: 2rem; border-radius: 1rem; border: 1px solid #334155;">
+            <h3 style="margin-bottom: 1.5rem; color: #38bdf8;">Tóm tắt đơn hàng</h3>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 1rem;">
+                {% for item in cart %}
+                <li style="display: flex; justify-content: space-between; border-bottom: 1px solid #1e293b; padding-bottom: 1rem;">
+                    <div style="color: #cbd5e1;">
+                        {{ item.quantity }}x {{ item.product.name }}
+                    </div>
+                    <div style="font-weight: bold;">{{ item.total_price|floatformat:0 }} VNĐ</div>
+                </li>
+                {% endfor %}
+                <li style="display: flex; justify-content: space-between; padding-top: 1rem; font-size: 1.2rem; font-weight: bold; color: #38bdf8;">
+                    <div>Tổng cộng</div>
+                    <div>{{ cart.get_total_price|floatformat:0 }} VNĐ</div>
+                </li>
+            </ul>
+        </div>
+        
+        <div style="background: #1e293b; padding: 2rem; border-radius: 1rem; border: 1px solid #334155;">
+            <h3 style="margin-bottom: 1.5rem; color: #38bdf8;">Phương thức thanh toán</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
+                    <input type="radio" name="payment_method" value="cash" checked style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
+                    <span>💵 Thanh toán tiền mặt khi nhận hàng (COD)</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
+                    <input type="radio" name="payment_method" value="card" style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
+                    <span>💳 Thẻ tín dụng / Ghi nợ</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
+                    <input type="radio" name="payment_method" value="transfer" style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
+                    <span>🏦 Chuyển khoản qua Ngân hàng</span>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%; padding: 1rem; border-radius: 0.5rem; font-size: 1.2rem; margin-top: 2rem;">💳 Xác nhận đặt hàng</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
