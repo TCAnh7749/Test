@@ -132,14 +132,14 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL='/media/'
 MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
 
-# STORAGES = {
-#     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
-# }
+STORAGES = {
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
 
 # settings.py
-STORAGES = {
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
-}
+# STORAGES = {
+#     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+# }
 
 # JAZZMIN SETTINGS
 JAZZMIN_SETTINGS = {
