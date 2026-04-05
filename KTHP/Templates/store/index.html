@@ -39,12 +39,10 @@
                     <form action="{% url 'home:cart_add' product.id %}" method="post" style="margin: 0; flex: 1;">
                         {% csrf_token %}
                         <button type="submit" class="btn"
-                            style="width: 100%; padding: 0.4rem 0; border-radius: 0.5rem; font-size: 0.9rem; text-align: center;">Mua
-                            ngay</button>
+                            style="width: 100%; padding: 0.4rem 0; border-radius: 0.5rem; font-size: 0.9rem; text-align: center;">Mua ngay</button>
                     </form>
                     <a href="{% url 'home:product_detail' product.slug %}" class="btn btn-outline"
-                        style="flex: 1; padding: 0.4rem 0; border-radius: 0.5rem; font-size: 0.9rem; text-align: center;">Chi
-                        tiết</a>
+                        style="flex: 1; padding: 0.4rem 0; border-radius: 0.5rem; font-size: 0.9rem; text-align: center;">Chi tiết</a>
                 </div>
             </div>
         </div>
