@@ -5,6 +5,12 @@
     <h2>Thanh toán</h2>
 </div>
 
+{% if error %}
+<div style="margin-bottom: 1.5rem; padding: 1rem; border-radius: 0.5rem; background: #7f1d1d; color: #fecaca; border: 1px solid #b91c1c;">
+    {{ error }}
+</div>
+{% endif %}
+
 <form method="post" style="display: flex; gap: 2rem; flex-wrap: wrap;">
     {% csrf_token %}
     <div style="flex: 2; min-width: 300px; background: #1e293b; padding: 2rem; border-radius: 1rem; border: 1px solid #334155;">
@@ -34,6 +40,11 @@
             <div>
                 <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Thành phố</label>
                 <input type="text" name="city" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Mã bưu chính</label>
+                <input type="text" name="postal_code" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
             </div>
         </div>
     </div>
