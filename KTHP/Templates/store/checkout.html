@@ -76,19 +76,93 @@
                     <span>💵 Thanh toán tiền mặt khi nhận hàng (COD)</span>
                 </label>
                 
-                <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
-                    <input type="radio" name="payment_method" value="card" style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
-                    <span>💳 Thẻ tín dụng / Ghi nợ</span>
-                </label>
+                <div id="card-option" style="display: flex; flex-direction: column; gap: 1rem; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
+                    <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer;">
+                        <input type="radio" name="payment_method" value="card" style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
+                        <span>💳 Thẻ tín dụng / Ghi nợ</span>
+                    </label>
+                    <div id="card-fields" style="max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.3s ease, opacity 0.2s ease;">
+                        <h4 style="margin: 0 0 1rem; color: #cbd5e1;">Thông tin thẻ</h4>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Tên chủ thẻ</label>
+                                <input type="text" name="card_name" placeholder="NGUYEN VAN A" style="width: 100%; padding: 0.8rem; background: #111827; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Số thẻ</label>
+                                <input type="text" name="card_number" placeholder="1234 5678 9012 3456" inputmode="numeric" style="width: 100%; padding: 0.8rem; background: #111827; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+                            </div>
+                            <div style="display: flex; gap: 1rem;">
+                                <div style="flex: 1;">
+                                    <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Ngày hết hạn</label>
+                                    <input type="text" name="card_expiry" placeholder="MM/YY" inputmode="numeric" style="width: 100%; padding: 0.8rem; background: #111827; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">CVV</label>
+                                    <input type="password" name="card_cvv" placeholder="123" inputmode="numeric" style="width: 100%; padding: 0.8rem; background: #111827; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
-                <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
-                    <input type="radio" name="payment_method" value="transfer" style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
-                    <span>🏦 Chuyển khoản qua Ngân hàng</span>
-                </label>
+                <div id="transfer-option" style="display: flex; flex-direction: column; gap: 1rem; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
+                    <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer;">
+                        <input type="radio" name="payment_method" value="transfer" style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
+                        <span>🏦 Chuyển khoản qua Ngân hàng</span>
+                    </label>
+                    <div id="transfer-fields" style="max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.3s ease, opacity 0.2s ease;">
+                        <h4 style="margin: 0 0 1rem; color: #cbd5e1;">Thông tin chuyển khoản</h4>
+                        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 1rem; align-items: center;">
+                            <div style="width: 140px; height: 140px; border-radius: 0.75rem; background: #111827; border: 1px solid #334155; display: flex; align-items: center; justify-content: center;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=TechStore-Transfer" alt="QR chuyển khoản" style="width: 120px; height: 120px; border-radius: 0.5rem;">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; color: #cbd5e1;">
+                                <div><strong>Ngân hàng:</strong> TechBank</div>
+                                <div><strong>Chủ tài khoản:</strong> Nguyen Van A</div>
+                                <div><strong>Số tài khoản:</strong> 1234 5678 9999</div>
+                                <div><strong>Nội dung:</strong> Thanh toan don hang</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             
             <button type="submit" class="btn" style="width: 100%; padding: 1rem; border-radius: 0.5rem; font-size: 1.2rem; margin-top: 2rem;">💳 Xác nhận đặt hàng</button>
         </div>
     </div>
 </form>
+
+<script>
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+    const cardFields = document.getElementById('card-fields');
+    const transferFields = document.getElementById('transfer-fields');
+
+    const toggleCardFields = () => {
+        const selected = document.querySelector('input[name="payment_method"]:checked');
+        const isCard = selected && selected.value === 'card';
+        if (isCard) {
+            cardFields.style.maxHeight = `${cardFields.scrollHeight + 24}px`;
+            cardFields.style.opacity = '1';
+        } else {
+            cardFields.style.maxHeight = '0';
+            cardFields.style.opacity = '0';
+        }
+
+        if (selected && selected.value === 'transfer') {
+            transferFields.style.maxHeight = `${transferFields.scrollHeight + 24}px`;
+            transferFields.style.opacity = '1';
+        } else {
+            transferFields.style.maxHeight = '0';
+            transferFields.style.opacity = '0';
+        }
+    };
+
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', toggleCardFields);
+    });
+
+    toggleCardFields();
+</script>
 {% endblock %}
