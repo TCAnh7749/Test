@@ -1,133 +1,94 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Category, Product, Order, OrderItem
-from .cart import Cart
+{% extends 'base.html' %}
 
-def home(request):
-    categories = Category.objects.all()
-    products = Product.objects.filter(available=True)[:12]
-    return render(request, 'store/index.html', {'categories': categories, 'products': products})
+{% block content %}
+<div class="section-header">
+    <h2>Thanh toán</h2>
+</div>
 
-def product_list(request, category_slug=None):
-    category = None
-    categories = Category.objects.all()
-    products = Product.objects.filter(available=True)
-    
-    query = request.GET.get('q')
-    if query:
-        products = products.filter(name__icontains=query)
+{% if error %}
+<div style="margin-bottom: 1.5rem; padding: 1rem; border-radius: 0.5rem; background: #7f1d1d; color: #fecaca; border: 1px solid #b91c1c;">
+    {{ error }}
+</div>
+{% endif %}
+
+<form method="post" style="display: flex; gap: 2rem; flex-wrap: wrap;">
+    {% csrf_token %}
+    <div style="flex: 2; min-width: 300px; background: #1e293b; padding: 2rem; border-radius: 1rem; border: 1px solid #334155;">
+        <h3 style="margin-bottom: 1.5rem; color: #38bdf8;">Thông tin giao hàng</h3>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Họ</label>
+                    <input type="text" name="first_name" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Tên</label>
+                    <input type="text" name="last_name" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+                </div>
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Email</label>
+                <input type="email" name="email" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Địa chỉ</label>
+                <input type="text" name="address" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Thành phố</label>
+                <input type="text" name="city" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: #94a3b8;">Mã bưu chính</label>
+                <input type="text" name="postal_code" required style="width: 100%; padding: 0.8rem; background: #0f172a; border: 1px solid #334155; border-radius: 0.5rem; color: white;">
+            </div>
+        </div>
+    </div>
+
+    <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 2rem; align-self: flex-start;">
+        <div style="background: #0f172a; padding: 2rem; border-radius: 1rem; border: 1px solid #334155;">
+            <h3 style="margin-bottom: 1.5rem; color: #38bdf8;">Tóm tắt đơn hàng</h3>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 1rem;">
+                {% for item in cart %}
+                <li style="display: flex; justify-content: space-between; border-bottom: 1px solid #1e293b; padding-bottom: 1rem;">
+                    <div style="color: #cbd5e1;">
+                        {{ item.quantity }}x {{ item.product.name }}
+                    </div>
+                    <div style="font-weight: bold;">{{ item.total_price|floatformat:0 }} VNĐ</div>
+                </li>
+                {% endfor %}
+                <li style="display: flex; justify-content: space-between; padding-top: 1rem; font-size: 1.2rem; font-weight: bold; color: #38bdf8;">
+                    <div>Tổng cộng</div>
+                    <div>{{ cart.get_total_price|floatformat:0 }} VNĐ</div>
+                </li>
+            </ul>
+        </div>
         
-    if category_slug:
-        category = get_object_or_404(Category, slug=category_slug)
-        products = products.filter(category=category)
-    return render(request, 'store/product_list.html', {'category': category, 'categories': categories, 'products': products, 'query': query})
-
-def product_detail(request, slug):
-    product = get_object_or_404(Product, slug=slug, available=True)
-    return render(request, 'store/detail.html', {'product': product})
-
-# --- Cart Views ---
-def cart_add(request, product_id):
-    cart = Cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    # Simple form submission for quantity
-    quantity = int(request.POST.get('quantity', 1))
-    cart.add(product=product, quantity=quantity)
-    
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse({'status': 'ok', 'cart_count': len(cart)})
-        
-    return redirect('home:cart_detail')
-
-def cart_remove(request, product_id):
-    cart = Cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    cart.remove(product)
-    return redirect('home:cart_detail')
-
-def cart_detail(request):
-    cart = Cart(request)
-    return render(request, 'store/cart.html', {'cart': cart})
-
-def cart_clear(request):
-    cart = Cart(request)
-    cart.clear()
-    return redirect('home:cart_detail')
-
-# --- Checkout Views ---
-def checkout(request):
-    cart = Cart(request)
-    if request.method == 'POST':
-        # Create order
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        address = request.POST.get('address')
-        postal_code = (request.POST.get('postal_code') or '').strip()
-        city = request.POST.get('city')
-        payment_method = request.POST.get('payment_method', 'cash')
-
-        if not postal_code:
-            return render(
-                request,
-                'store/checkout.html',
-                {'cart': cart, 'error': 'Vui lòng nhập mã bưu chính.'}
-            )
-
-        order = Order.objects.create(
-            first_name=first_name, last_name=last_name,
-            email=email, address=address,
-            postal_code=postal_code, city=city,
-            payment_method=payment_method
-        )
-        if request.user.is_authenticated:
-            order.user = request.user
-            order.save()
-
-        for item in cart:
-            OrderItem.objects.create(
-                order=order, product=item['product'],
-                price=item['price'], quantity=item['quantity']
-            )
-        cart.clear()
-        return render(request, 'store/order_created.html')
-    return render(request, 'store/checkout.html', {'cart': cart})
-
-# --- Authentication Views ---
-def register_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home:home')
-    else:
-        form = UserCreationForm()
-    return render(request, 'store/register.html', {'form': form})
-
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            next_url = request.GET.get('next', 'home:home')
-            if next_url == '/': next_url = 'home:home'
-            return redirect(next_url)
-    else:
-        form = AuthenticationForm()
-    return render(request, 'store/login.html', {'form': form})
-
-def logout_view(request):
-    logout(request)
-    return redirect('home:home')
-
-# --- Error Views ---
-def error(request, exception=None):
-    return render(request, 'error.html', status=404)
-
-def error_500(request):
-    return render(request, 'error.html', status=500)
-
+        <div style="background: #1e293b; padding: 2rem; border-radius: 1rem; border: 1px solid #334155;">
+            <h3 style="margin-bottom: 1.5rem; color: #38bdf8;">Phương thức thanh toán</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
+                    <input type="radio" name="payment_method" value="cash" checked style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
+                    <span>💵 Thanh toán tiền mặt khi nhận hàng (COD)</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
+                    <input type="radio" name="payment_method" value="card" style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
+                    <span>💳 Thẻ tín dụng / Ghi nợ</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; padding: 1rem; background: #0f172a; border-radius: 0.8rem; border: 1px solid #334155;">
+                    <input type="radio" name="payment_method" value="transfer" style="width: 1.2rem; height: 1.2rem; accent-color: #38bdf8;">
+                    <span>🏦 Chuyển khoản qua Ngân hàng</span>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%; padding: 1rem; border-radius: 0.5rem; font-size: 1.2rem; margin-top: 2rem;">💳 Xác nhận đặt hàng</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
