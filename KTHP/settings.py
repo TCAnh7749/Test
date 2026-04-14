@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dev-insecure-change-me")
 # SECURITY WARNING: don't run with debug turned on in production!
 # Default to DEBUG=False for safety; enable by setting DEBUG=1 in environment.
 DEBUG = os.environ.get("DEBUG", "0") == "1"
-DEBUG = True
+
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 
