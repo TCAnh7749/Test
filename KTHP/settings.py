@@ -22,12 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-insecure-change-me")
 
-# Google AI API key (Gemini)
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 # SECURITY WARNING: don't run with debug turned on in production!
 # Default to DEBUG=False for safety; enable by setting DEBUG=1 in environment.
 DEBUG = os.environ.get("DEBUG", "0") == "1"
-
+DEBUG = True
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 
@@ -83,8 +81,15 @@ WSGI_APPLICATION = 'KTHP.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'neondb',
+        'USER': 'neondb_owner',
+        'PASSWORD': 'npg_0uYfXCnsV5qd',
+        'HOST': 'ep-snowy-mountain-amj3yz1x.c-5.us-east-1.aws.neon.tech',
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 
