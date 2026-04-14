@@ -1,5 +1,7 @@
 asgiref==3.11.1
 Django==6.0.3
+django-cloudinary-storage==0.3.0
+cloudinary==1.40.0
 django-jazzmin==3.0.4
 pillow==12.2.0
 psycopg[binary]==3.3.3
