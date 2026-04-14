@@ -88,6 +88,7 @@
 
     <footer>
         <p>&copy; 2026 TechStore. All rights reserved.</p>
+
     </footer>
 
     <!-- Chat Widget -->
@@ -152,7 +153,16 @@
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.status !== 'ok') console.error('Error sending message');
+                    if (data.status !== 'ok') {
+                        console.error('Error sending message');
+                        return;
+                    }
+                    if (data.ai_message) {
+                        appendMessage(data.ai_message, true);
+                        if (data.ai_message_id && data.ai_message_id > lastMessageId) {
+                            lastMessageId = data.ai_message_id;
+                        }
+                    }
                 });
         }
 
